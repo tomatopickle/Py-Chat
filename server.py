@@ -8,14 +8,17 @@ host = '192.168.1.50'  # LocalHost
 port = 7976  # Choosing unreserved port
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((host, port))  # binding host and port to socket
+server.bind((socket.gethostname(), port))  # binding host and port to socket
 server.listen()
+
+print('Listening at port 7976, hostname:', socket.gethostname())
 
 clients = []
 clientData = []
 
 f = Figlet(font='larry3d')
-print (f.renderText('Py Chat Server Running'))
+print(f.renderText('Py Chat Server Running'))
+
 
 def broadcast(message):
     for client in clients:
@@ -51,10 +54,11 @@ def receive():
         clients.append(client)
         print("Nickname is {}".format(data['name']))
         broadcast(pickle.dumps(
-            {"msg": colored("{} joined!".format(data['name']),'green'), "roomId": data['roomId']}))
+            {"msg": colored("{} joined!".format(data['name']), 'green'), "roomId": data['roomId']}))
         client.send(pickle.dumps(
             {"msg": f"Connected to Sever! Room ID:{data['roomId']}", "roomId": data['roomId']}))
         thread = threading.Thread(target=handle, args=(client,))
         thread.start()
+
 
 receive()
